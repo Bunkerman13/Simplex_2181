@@ -17,7 +17,14 @@ class Application
 	MyMesh* m_pMesh = nullptr;
 	MyMesh* m_pMesh1 = nullptr;
 
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
+	MyMesh* cube = nullptr;
+
+	//46 cubes
+	std::vector<MyMesh*> invaderCubes;
+	bool left = true;
+	float value = 0;
+
+	String m_sProgrammer = "Elliot Privateer - ejp4604@rit.edu";
 private:
 	static ImGuiObject gui; //GUI object
 

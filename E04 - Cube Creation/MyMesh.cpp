@@ -12,10 +12,25 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	if (a_nSubdivisions > 360)
 		a_nSubdivisions = 360;
 
-	/*
-		Calculate a_nSubdivisions number of points around a center point in a radial manner
-		then call the AddTri function to generate a_nSubdivision number of faces
-	*/
+	Release();
+	Init();
+
+	vector3 c(0, 0, 0);
+
+	float increment = 0;
+
+	float xVal = cos((increment*PI) / 180.0f)*a_fRadius;
+	float yVal = sin((increment*PI) / 180.0f)*a_fRadius;
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		vector3 a(xVal, yVal, 0);
+		increment += (360.0f / a_nSubdivisions);
+		xVal = cos((increment*PI) / 180.0f)*a_fRadius;
+		yVal = sin((increment*PI) / 180.0f)*a_fRadius;
+		vector3 b(xVal, yVal, 0);
+		AddTri(a, b, c);
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -298,13 +313,28 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
+
+
+	vector3 c(0, a_fHeight, 0);
+
+	float increment = 0;
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		vector3 a(cos((increment*PI) / 180)*a_fRadius, 0, sin((increment*PI) / 180)*a_fRadius);
+		increment += (360 / a_nSubdivisions);
+		vector3 b(cos((increment*PI) / 180)*a_fRadius, 0, sin((increment*PI) / 180)*a_fRadius);
+		AddTri(b, a, c);
+		AddTri(a, b, vector3(0, 0, 0));
+	}
+
+	/*// Replace this with your code
 	Mesh* pMesh = new Mesh();
 	pMesh->GenerateCone(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------
+	// -------------------------------*/
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -326,13 +356,37 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
+	vector3 c(0, 0, 0);
+
+	float increment = 0;
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		vector3 a(cos((increment*PI) / 180)*a_fRadius, 0, sin((increment*PI) / 180)*a_fRadius);
+		increment += (360 / a_nSubdivisions);
+		vector3 b(cos((increment*PI) / 180)*a_fRadius, 0, sin((increment*PI) / 180)*a_fRadius);
+		AddTri(a, b, c);
+		a.y = a_fHeight;
+		b.y = a_fHeight;
+		c.y = a_fHeight;
+		AddTri(b, a, c);
+		a.y = 0;
+		b.y = 0;
+		c.y = 0;
+		AddTri(b, a, vector3(b.x, a_fHeight, b.z));
+		b.y = a_fHeight;
+		AddTri(b, a, vector3(a.x, a_fHeight, a.z));
+	}
+
+	
+	/*
 	// Replace this with your code
 	Mesh* pMesh = new Mesh();
 	pMesh->GenerateCylinder(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------
+	// -------------------------------*/
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -360,13 +414,48 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
+
+	
+	
+	float increment = 0;
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		vector3 c(cos((increment*PI) / 180)*a_fInnerRadius, 0, sin((increment*PI) / 180)*a_fInnerRadius);
+		vector3 a(cos((increment*PI) / 180)*a_fOuterRadius, 0, sin((increment*PI) / 180)*a_fOuterRadius);
+		vector3 a2(cos((increment*PI) / 180)*a_fInnerRadius, 0, sin((increment*PI) / 180)*a_fInnerRadius);
+		increment += (360 / a_nSubdivisions);
+		vector3 b(cos((increment*PI) / 180)*a_fOuterRadius, 0, sin((increment*PI) / 180)*a_fOuterRadius);
+		vector3 b2(cos((increment*PI) / 180)*a_fInnerRadius, 0, sin((increment*PI) / 180)*a_fInnerRadius);
+		AddTri(b, c, a);
+		vector3 c2(cos((increment*PI) / 180)*a_fInnerRadius, 0, sin((increment*PI) / 180)*a_fInnerRadius);
+		AddTri(c, b, c2);
+		a.y = a_fHeight;
+		b.y = a_fHeight;
+		c.y = a_fHeight;
+		AddTri(b, a, c);
+		c2.y = a_fHeight;
+		AddTri(c2, b, c);
+		a.y = 0;
+		b.y = 0;
+		c.y = 0;
+		AddTri(b, a, vector3(b.x, a_fHeight, b.z));
+		AddTri(a2, b2, vector3(b2.x, a_fHeight, b2.z));
+		b.y = a_fHeight;
+		b2.y = a_fHeight;
+		AddTri(b, a, vector3(a.x, a_fHeight, a.z));
+		AddTri(a2, b2, vector3(a2.x, a_fHeight, a2.z));
+	}
+	
+	
+
+	/*// Replace this with your code
 	Mesh* pMesh = new Mesh();
 	pMesh->GenerateTube(a_fOuterRadius, a_fInnerRadius, a_fHeight, a_nSubdivisions, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------
+	// -------------------------------*/
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -396,13 +485,14 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Release();
 	Init();
 
-	// Replace this with your code
+	
+	/*// Replace this with your code
 	Mesh* pMesh = new Mesh();
-	pMesh->GenerateTorus(a_fOuterRadius, a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
+	pMesh->GenerateTorus(a_fOuterRadius,a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------
+	// -------------------------------*/
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
