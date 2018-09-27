@@ -17,18 +17,18 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 
 	vector3 c(0, 0, 0);
 
-	float increment = 0;
+	float increment = 0.0f;
 
 	float xVal = cos((increment*PI) / 180.0f)*a_fRadius;
 	float yVal = sin((increment*PI) / 180.0f)*a_fRadius;
 
 	for (int x = 0; x < a_nSubdivisions; x++)
 	{
-		vector3 a(xVal, yVal, 0);
+		vector3 a(xVal, yVal, 0.0f);
 		increment += (360.0f / a_nSubdivisions);
 		xVal = cos((increment*PI) / 180.0f)*a_fRadius;
 		yVal = sin((increment*PI) / 180.0f)*a_fRadius;
-		vector3 b(xVal, yVal, 0);
+		vector3 b(xVal, yVal, 0.0f);
 		AddTri(a, b, c);
 	}
 
@@ -485,14 +485,63 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Release();
 	Init();
 
+	if (true)
+	{
+		/*
+		float incrementB = 0;
+		float incrementA = 0;
+		std::vector<vector3> points;
+
+		vector3 c(0);
+		matrix4 rotate;
+		matrix4 transform; 
+		for (int x = 0; x < a_nSubdivisionsB; x++)
+		{
+			c.x += cos((incrementB*PI) / 180);
+			c.z += sin((incrementB*PI) / 180);
+			transform = glm::translate(vector3(cos((incrementB*PI) / 180), 0, sin((incrementB*PI) / 180)));
+			rotate[0] = vector4(cos((incrementB*PI) / 180), 0, sin((incrementB*PI) / 180), 0);
+			rotate[1] = vector4((float)0, (float)1, (float)0, (float)0);
+			rotate[2] = vector4((float)-(sin((incrementB*PI) / 180)), (float)0, (float)cos((incrementB*PI) / 180), 0);
+			rotate[3] = vector4(0, 0, 0, 1);
+			for (int y = 0; y < a_nSubdivisionsA; y++)
+			{
+				vector3 a(cos((incrementA*PI) / 180) + c.x, sin((incrementA*PI) / 180), 0.0f + c.z);
+				vector4 a2 = rotate * vector4(a.x, a.y, a.z, 1);
+				a = (vector3)a2;
+				incrementA += (360 / a_nSubdivisionsA);
+				points.push_back(a);
+				vector3 b(cos((incrementA*PI) / 180) + c.x, sin((incrementA*PI) / 180), 0.0f + c.z);
+				vector4 b2 = rotate * vector4(b.x, b.y, b.z, 0);
+				b = (vector3)b2;
+				vector4 c2 = rotate * vector4(c.x, c.y, c.z, 1);
+				
+				AddTri(a, b, vector3(c2));
+				//points.push_back(b);
+			}
+			incrementB += (360 / a_nSubdivisionsB);
+		}
+
+		
+		for (int x = 0; x < a_nSubdivisionsA; x++)
+		{
+			
+			//AddQuad(points[x], points[x + 1], points[x + a_nSubdivisionsA], points[x + 1 + a_nSubdivisionsA]);
+		}
+		
+	}*/
 	
-	/*// Replace this with your code
+	
+	// Replace this with your code
 	Mesh* pMesh = new Mesh();
-	pMesh->GenerateTorus(a_fOuterRadius,a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
+	pMesh->GenerateTorus(a_fOuterRadius, a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------*/
+		// -------------------------------
+	
+	
+	
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -509,19 +558,73 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	//if (a_nSubdivisions > 6)
+		//a_nSubdivisions = 6;
 
 	Release();
 	Init();
 
-	// Replace this with your code
+	vector3 c(0, 0, 0);
+	vector3 save;
+	std::vector<vector3> points;
+
+	float increment1 = 0;
+	float increment2 = 0;
+	float rad = a_fRadius;
+
+	for (int y = 0; y <= a_nSubdivisions; y++)
+	{
+		for (int x = 0; x < a_nSubdivisions; x++)
+		{
+			if (y == 0)
+			{
+				vector3 a(rad*cos((increment1*PI)/180.0f)*sin((increment2*PI)/180.0f), rad*sin((increment1*PI)/180.0f)*sin((increment2*PI)/180.0f), rad*cos((increment2*PI)/180.0f));
+				increment1 += (360 / a_nSubdivisions);
+				
+				vector3 b(rad*cos((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*sin((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*cos((increment2*PI) / 180.0f));
+				AddTri(a, b, c);
+				points.push_back(a);
+			}
+			else
+			{
+				
+				vector3 d(rad*cos((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*sin((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*cos((increment2*PI) / 180.0f));
+				increment1 += (360 / a_nSubdivisions);
+				
+				vector3 e(rad*cos((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*sin((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*cos((increment2*PI) / 180.0f));
+				
+				
+				if (x != a_nSubdivisions - 1)
+				{
+					if (x == 0)
+						save = points[x];
+					AddQuad(points[x+1], points[x], e, d);
+					points[x] = d;
+				}
+				else
+				{
+					AddQuad(save, points[x], e, d);
+					points[x] = d;
+					
+					
+				}
+	
+			}
+			
+		}
+		increment2 += (180 / a_nSubdivisions);
+
+	}
+	
+	
+
+	/*// Replace this with your code
 	Mesh* pMesh = new Mesh();
 	pMesh->GenerateSphere(a_fRadius, a_nSubdivisions, a_v3Color);
 	m_lVertexPos = pMesh->GetVertexList();
 	m_uVertexCount = m_lVertexPos.size();
 	SafeDelete(pMesh);
-	// -------------------------------
+	// -------------------------------*/
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

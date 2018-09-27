@@ -206,6 +206,17 @@ void Application::Release(void)
 		delete m_pMesh;
 		m_pMesh = nullptr;
 	}
+
+	for (int x = 0; x < invaderCubes.size(); x++)
+	{
+		if (invaderCubes[x] != nullptr)
+		{
+			delete invaderCubes[x];
+			invaderCubes[x] = nullptr;
+		}
+		SafeDelete(invaderCubes[x]);
+	}
+
 	SafeDelete(m_pMesh1);
 	//release GUI
 	ShutdownGUI();
