@@ -451,7 +451,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	float increment2 = 0;
 	float rad = a_fRadius;
 
-	for (int y = 0; y <= a_nSubdivisions; y++)
+	for (int y = 0; y < a_nSubdivisions; y++)
 	{
 		for (int x = 0; x < a_nSubdivisions; x++)
 		{
@@ -459,7 +459,6 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 			{
 				vector3 a(rad*cos((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*sin((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*cos((increment2*PI) / 180.0f));
 				increment1 += (360 / a_nSubdivisions);
-
 				vector3 b(rad*cos((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*sin((increment1*PI) / 180.0f)*sin((increment2*PI) / 180.0f), rad*cos((increment2*PI) / 180.0f));
 				AddTri(a, b, c);
 				points.push_back(a);

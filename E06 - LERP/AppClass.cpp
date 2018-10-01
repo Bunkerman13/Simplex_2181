@@ -52,14 +52,60 @@ void Application::Display(void)
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
 	//calculate the current position
-	vector3 v3CurrentPos;
+	static vector3 v3CurrentPos;
+	static float percent = 0;
+	static int position = 0;
+
+	// used to help send object back to start from last element
+	// NOTE: couldn't figure out effective use of swap as it so I used this instead
+	static int subVal = 0;
+	vector3 start = m_stopsList[position];
+	vector3 end = m_stopsList[position + 1 - subVal];
 	
+	// uses built in lerp function
+	v3CurrentPos = glm::lerp(start, end, percent);
 
+	// increases percentage of lerp completed
+	percent += 0.03f;
 
+	// if percent is 1.0 or more, then it is completed
+	if (percent >= 1.0f)
+	{
+		// percent resets for next lerp and position increments for new start and end
+		percent = 0.0f;
+		position++;
 
+		// checks if the position is greater than or equal to size of list - 1
+		if (position >= m_stopsList.size() - 1)
+		{
+			// changes subVal to equal list size for subtraction
+			subVal = m_stopsList.size();
+
+			// after one round through, changes elements back to 0 for restarting list order
+			if (position == m_stopsList.size())
+			{
+				position = 0;
+				subVal = 0;
+			}		
+		}
+	}
+		
+	/// --------NOTES---------
+	///static float percent = 0.0f;
+	///static vector3 start(0, 0, 0);
+	///static vector3 end(5, 0, 0);
+	///vector3 position = glm::lerp(start, end, percent);
+	///matrix4 m4Pos = glm::translate(IDENTITY_M4, m_stopsList[0]);
+
+	///if (percent >= 1.0f)
+	///{
+		///std::swap(start, end);
+		///percent = 0.0f;
+	///}
+	///percent += 0.01f;
 
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	//v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
 	//-------------------
 	
 
