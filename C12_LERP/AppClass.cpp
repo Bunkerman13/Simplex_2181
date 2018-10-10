@@ -43,6 +43,37 @@ void Application::Display(void)
 	float fCurrentPos = glm::lerp(fStartPos, fEndPos, fPercentage);
 	matrix4 m4Model = glm::translate(IDENTITY_M4, vector3(fCurrentPos, 0.0f, 0.0f));
 	*/
+	static DWORD startTime = GetTickCount();
+	DWORD currentTime = GetTickCount();
+	DWORD differenceTime = startTime - currentTime;
+	startTime = GetTickCount();
+
+	float totalTime = 2.0f;
+	float timer = static_cast<float>(differenceTime / 1000.0f);
+
+	float fStart = 0.0f;
+	float fEnd = 180.0f;
+	
+	
+	float percent = MapValue(timer, 0.0f, totalTime, 0.0f, 1.0f);
+	float fCurrent = glm::lerp(fStart, fEnd, percent);
+
+	vector3 start;
+	vector3 end;
+
+	vector3 moving = glm::lerp(start, end, percent);
+	
+
+	matrix4 rotate = glm::rotate(IDENTITY_M4, glm::radians(fCurrent), AXIS_Z);
+	matrix4 pos = glm::translate(rotate, moving);
+
+	/// render object code
+
+	if (percent >= 1.0f)
+	{
+		startTime = GetTickCount();
+		/// swapping code
+	}
 
 	//Sol2
 	//Get a timer

@@ -31,11 +31,28 @@ void Application::InitVariables(void)
 	/*
 		This part will create the orbits, it start at 3 because that is the minimum subdivisions a torus can have
 	*/
+
+	///
+	float degRot = 0.0f;
+	///
 	uint uSides = 3; //start with the minimal 3 sides
 	for (uint i = uSides; i < m_uOrbits + uSides; i++)
 	{
+		/// creates vector for points on path
+		std::vector<vector3> orbitPos;
+		vector3 vec(fSize, 0.0, 0.0f);
+		shapePaths.push_back(orbitPos);
+		///
 		vector3 v3Color = WaveLengthToRGB(uColor); //calculate color based on wavelength
 		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
+		/// creates paths based on subdivisions
+		degRot = (360.0f / i);
+		for (int x = 0; x < i; x++)
+		{
+			shapePaths[i - 3].push_back(vec);
+			vec = glm::rotate(vec, glm::radians(degRot), AXIS_Z);
+		}
+		///
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
 	}
@@ -55,6 +72,17 @@ void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
+	///  increases percentage based on timer and sets up position number
+	static DWORD DStartingTime = GetTickCount();
+	DWORD DCurrentTime = GetTickCount();
+	DWORD DDelta = DCurrentTime - DStartingTime;
+	float fTimer = static_cast<float>(DDelta / 1000.0f);
+	float fTotalTime = 0.5f;
+
+	static int pos = 0;
+
+	float fPercent = MapValue(fTimer, 0.0f, fTotalTime, 0.0f, 1.0f);
+	/// 
 
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix(); //view Matrix
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix(); //Projection Matrix
@@ -62,7 +90,7 @@ void Application::Display(void)
 	/*
 		The following offset will orient the orbits as in the demo, start without it to make your life easier.
 	*/
-	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
+	m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; ++i)
@@ -71,11 +99,21 @@ void Application::Display(void)
 
 		//calculate the current position
 		vector3 v3CurrentPos = ZERO_V3;
+		///  sets start and end points based off position and size of path
+		v3CurrentPos = glm::lerp(shapePaths[i][pos % shapePaths[i].size()], shapePaths[i][(pos + 1) % shapePaths[i].size()], fPercent);
+		///
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
 		m_pMeshMngr->AddSphereToRenderList(m4Model * glm::scale(vector3(0.1)), C_WHITE);
 	}
+	/// if complete, increment position
+	if (fPercent >= 1.0f)
+	{
+		DStartingTime = GetTickCount();
+		pos++;
+	}
+	///
 
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();

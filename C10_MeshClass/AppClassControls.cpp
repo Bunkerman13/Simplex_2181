@@ -413,6 +413,29 @@ void Application::ProcessKeyboard(void)
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::E))
 		m_pCameraMngr->MoveVertical(fSpeed);
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	{
+		angles.x += 1.0f;
+		if (fMultiplier)
+			angles.x -= 2.0f;
+	}
+		
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Y))
+	{
+		angles.y += 1.0f;
+		if (fMultiplier)
+			angles.y -= 2.0f;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	{
+		angles.z += 1.0f;
+		if (fMultiplier)
+			angles.z -= 2.0f;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+		angles = vector3(0.0f);
 #pragma endregion
 }
 //Joystick

@@ -19,12 +19,9 @@ class Application
 
 	MyMesh* cube = nullptr;
 
-	//46 cubes
-	std::vector<MyMesh*> invaderCubes;
-	bool left = true;
-	float value = 0;
-
 	String m_sProgrammer = "Elliot Privateer - ejp4604@rit.edu";
+
+	vector3 angles;
 private:
 	static ImGuiObject gui; //GUI object
 

@@ -1,22 +1,14 @@
 #include "AppClass.h"
 void Application::InitVariables(void)
 {
+	m_pCameraMngr->SetPositionTargetAndUpward(AXIS_Z * 5, ZERO_V3, AXIS_Y);
 	//Make MyMesh object
-	/*m_pMesh = new MyMesh();
-	m_pMesh->GenerateCube(2.0f, C_BROWN);
+	m_pMesh = new MyMesh();
+	m_pMesh->GenerateCube(1.0f, C_RED);
 
 	//Make MyMesh object
 	m_pMesh1 = new MyMesh();
-	m_pMesh1->GenerateCube(1.0f, C_WHITE);*/
-
-	for (int x = 0; x < 46; x++)
-	{
-		cube = new MyMesh();
-		cube->GenerateCube(0.5f, C_BLACK);
-		invaderCubes.push_back(cube);
-	}
-	
-		
+	m_pMesh1->GenerateCube(1.0f, C_WHITE);
 }
 void Application::Update(void)
 {
@@ -33,169 +25,71 @@ void Application::Display(void)
 {
 	// Clear the screen
 	ClearScreen();
+	static DWORD DStartingTime = GetTickCount();
+	DWORD DCurrentTime = GetTickCount();
+	DWORD DDelta = DCurrentTime - DStartingTime;
+	float fTimer = static_cast<float>(DDelta / 1000.0f);
+	std::cout << fTimer << std::endl;
 
-	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
-	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
-	///matrix4 m4Model = matrix4(1.0f);  // IDENTITY_M4 == identity matrix also
-	///m4Model = ToMatrix4(m_qArcBall);
-	///matrix4 scale = glm::scale(vector3(5.0f));
-	///matrix4 scale = IDENTITY_M4 * glm::scale(vector3(5.0f)); == glm::scale(IDENTITY_M4 ,vector3(5.0f));
-	///matrix4 scale = glm::scale(IDENTITY_M4 ,vector3(5.0f));
-	///matrix4 translate = glm::translate(IDENTITY_M4 ,vector3(1.0f, 0, 0));
+	float fTotalTime = 5.5f;
 
-	///matrix4 translate = glm::translate(scale, vector3(1.0f, 0, 0)); // same as scale * translation with identities
+	float fPercent = MapValue(fTimer, 0.0f, fTotalTime, 0.0f, 1.0f);
 
-	///matrix4 m4Model = scale * translate;  // IDENTITY_M4 == identity matrix also
-	///matrix4 m4Model = translate * scale;  // not the same as above
+	static vector3 v3InitialPoint(0.0f, 0.0f, 0.0f);
+	static vector3 v3EndPoint(5.0f, 0.0f, 0.0f);
 
-	///matrix4 m4Model = translate;
+	static float fStart = 0.0f;
+	static float fEnd = 180.0f;
+
+	float fCurrent = glm::lerp(fStart, fEnd, fPercent);
+	vector3 v3Position = glm::lerp(v3InitialPoint, v3EndPoint, fPercent);
+
+	matrix4 m4Rotation = glm::rotate(IDENTITY_M4, glm::radians(fCurrent), AXIS_Z);
+	matrix4 m4Position = glm::translate(m4Rotation, v3EndPoint);
+
+	/*-------------------------------------------------------------------------------*/
+	//m4Position = glm::translate(vector3(0.0f));  // ignoring above transformation code
+
+	matrix4 m4RotX = glm::rotate(IDENTITY_M4, glm::radians(angles.x), AXIS_X);// AXIS_X == vector3(1.0f, 0.0f, 0.0f)
+	matrix4 m4RotY = glm::rotate(IDENTITY_M4, glm::radians(angles.y), AXIS_Y);
+	matrix4 m4RotZ = glm::rotate(IDENTITY_M4, glm::radians(angles.z), AXIS_Z);
+
+	matrix4 m4Transform = m4RotX * m4RotZ * m4RotY;
+
+	glm::quat q1; //same as quaternion
+	quaternion q2 = glm::angleAxis(glm::radians(45.0f), AXIS_Z);
+	static quaternion q3 = q1 * q2;
+	//q3 = q3 * q2;
+
+
+	//m_pMesh->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), m4Transform);
+	m_pMesh->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), ToMatrix4(q3));
 	
-	matrix4 m4Model = glm::translate(vector3(-1.5f + value, 2.0f, 0.0f));
-
-	vector3 pos(-1.5f + value, 1, 0);
-
-	float var = 0;
-	for (int x = 0; x < 25; x++)
+	//angles = vector3(fTimer * 40.0f);
+	/*
+	if (fPercent >= 1.0f)
 	{
-		
-		if (x < 1)
-		{
-			invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-			m4Model = glm::translate(vector3(1.5f + value, 2.0f, 0.0f));
-			invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-		}
-		else if (x < 2)
-		{
-			m4Model = glm::translate(vector3(-1.0f + value, 1.5f, 0.0f));
-			invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-			m4Model = glm::translate(vector3(1.0f + value, 1.5f, 0.0f));
-			invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-		}
-		else if (x < 5)
-		{
-			m4Model = glm::translate(vector3(-1.5f + var + value, 1, 0));
-			invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-			m4Model = glm::translate(vector3(1.5f - var + value, 1, 0));
-			invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-			var += 0.5f;
-			if (x == 4)
-				var = 0;
-		}
-		else if (x < 9)
-		{
-			if (x != 7)
-			{
-				m4Model = glm::translate(vector3(-2.0f + var + value, 0.5f, 0));
-				invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(2.0f - var + value, 0.5f, 0));
-				invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-			}
-			
-			var += 0.5f;
-			if (x == 8)
-				var = 0;
-		}
-		else if (x < 14)
-		{
-			
-			
-			m4Model = glm::translate(vector3(-2.5f + var + value, 0.0f, 0));
-			invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-			m4Model = glm::translate(vector3(2.5f - var + value, 0.0f, 0));
-			invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-			
-
-			var += 0.5f;
-			if (x == 13)
-				var = 0;
-				
-		}
-		else if (x < 19)
-		{
-			if (x != 15)
-			{
-				m4Model = glm::translate(vector3(-2.5f + var + value, -0.5f, 0));
-				invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(2.5f - var + value, -0.5f, 0));
-				invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-			}
-
-			var += 0.5f;
-			if (x == 18)
-				var = 0;
-		}
-		else if (x < 22)
-		{
-			if (x != 20)
-			{
-				m4Model = glm::translate(vector3(-2.5f + var + value, -1.0f, 0));
-				invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(2.5f - var + value, -1.0f, 0));
-				invaderCubes[x + 23]->Render(m4Projection, m4View, m4Model);
-			}
-
-			var += 0.5f;
-			if (x == 21)
-				var = 0;
-		
-		}
-		else if (x < 24)
-		{
-			m4Model = glm::translate(vector3(-1.0f + var + value, -1.5f, 0));
-			invaderCubes[x]->Render(m4Projection, m4View, m4Model);
-			m4Model = glm::translate(vector3(1.0f - var + value, -1.5f, 0));
-			invaderCubes[x + 21]->Render(m4Projection, m4View, m4Model);
-
-			if (x == 23)
-			{
-				m4Model = glm::translate(vector3(value, 1, 0));
-				invaderCubes[24]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(value, 0.5f, 0));
-				invaderCubes[25]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(value, 0, 0));
-				invaderCubes[44]->Render(m4Projection, m4View, m4Model);
-				m4Model = glm::translate(vector3(value, -0.5f, 0));
-				invaderCubes[45]->Render(m4Projection, m4View, m4Model);
-			}
-			
-
-			var += 0.5f;
-		}
-		
+		DStartingTime = GetTickCount();
+		//std::swap(v3InitialPoint, v3EndPoint);
+		std::swap(fStart, fEnd);
+		//fPercent = 0.00f;
 	}
+	fPercent += 0.01f;
+	*/
+	//m_pMesh1->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), glm::translate(vector3( 3.0f, 0.0f, 0.0f)));
 
-
-	if (left)
-	{
-		value += 0.05f;
-		if (value > 5.0f)
-			left = !left;
-	}
-	else
-	{
-		value -= 0.05f;
-		if (value < -5.0)
-			left = !left;
-	}
-		
-	
-	
-
-	///m_pMesh->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), ToMatrix4(m_qArcBall));
-	///m_pMesh1->Render(m_pCameraMngr->GetProjectionMatrix(), m_pCameraMngr->GetViewMatrix(), glm::translate(vector3( 3.0f, 0.0f, 0.0f)));
-		
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
-	
+
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
 
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
-	
+
 	//draw gui
 	DrawGUI();
-	
+
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
