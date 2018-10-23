@@ -12,8 +12,8 @@ void Application::InitVariables(void)
 	//init the camera
 	m_pCamera = new MyCamera();
 	m_pCamera->SetPositionTargetAndUpward(
-			vector3(0.0f, 3.0f, 20.0f), //Where my eyes are
-			vector3(0.0f, 3.0f, 19.0f), //where what I'm looking at is
+			vector3(0.0f, 3.0f, 20.0f), //Where my eyes are 20 z
+			vector3(0.0f, 3.0f, 19.0f), //where what I'm looking at is 19 z
 			AXIS_Y);					//what is up
 
 	//Get the singleton

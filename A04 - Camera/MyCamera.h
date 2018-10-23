@@ -16,6 +16,12 @@ class MyCamera
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
 	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
 
+	///
+	vector3 m_v3Forward = vector3(0.f, 0.f, -1.f);
+	vector3 m_v3Right = vector3(1.f, 0.f, 0.f);
+	quaternion m_qOrientation = IDENTITY_QUAT;
+	///
+
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
 	float m_fFOV = 45.0f; //Field of View
@@ -28,6 +34,8 @@ class MyCamera
 
 	matrix4 m_m4View; //View matrix
 	matrix4 m_m4Projection; //Projection Matrix
+
+	
 public:
 	/*
 	USAGE: Constructor
@@ -230,6 +238,10 @@ public:
 	OUTPUT: ---
 	*/
 	void MoveSideways(float a_fDistance = 0.1f);
+
+	void ChangePitch(float angle = 0.f);
+
+	void ChangeYaw(float angle = 0.f);
 };
 
 } //namespace Simplex

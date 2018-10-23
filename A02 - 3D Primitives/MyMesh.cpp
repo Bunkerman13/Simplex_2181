@@ -493,8 +493,14 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		increment2 += (180 / a_nSubdivisions);
 
 	}
-
-
+	c.y += a_fRadius;
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		if (x == a_nSubdivisions - 1)
+			AddTri(points[0], points[x], c);
+		else
+			AddTri(points[x + 1], points[x], c);
+	}
 
 	// -------------------------------
 

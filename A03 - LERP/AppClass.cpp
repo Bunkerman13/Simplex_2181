@@ -100,6 +100,7 @@ void Application::Display(void)
 		//calculate the current position
 		vector3 v3CurrentPos = ZERO_V3;
 		///  sets start and end points based off position and size of path
+
 		v3CurrentPos = glm::lerp(shapePaths[i][pos % shapePaths[i].size()], shapePaths[i][(pos + 1) % shapePaths[i].size()], fPercent);
 		///
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);

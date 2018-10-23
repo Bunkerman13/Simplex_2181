@@ -21,6 +21,10 @@ class Application
 
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 
+	float m_fFovy = 45.0f;
+
+	MyMesh* m_pMesh = nullptr;
+
 private:
 	static ImGuiObject gui; //GUI object
 
