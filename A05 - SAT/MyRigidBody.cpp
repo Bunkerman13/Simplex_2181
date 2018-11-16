@@ -273,12 +273,6 @@ void MyRigidBody::AddToRenderList(void)
 	}
 }
 
-struct OBB {
-	vector3 c;
-	vector3 u[3];
-	vector3 e;
-};
-
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
 	/*
@@ -293,31 +287,34 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	*/
 	
 	// uses custom OBB struct to create and set values for center, halfwidth and local acis
-	OBB a;  a.c = GetCenterGlobal();  a.e = m_v3HalfWidth;
 
-	a.u[0] = (m_m4ToWorld * vector4(AXIS_X, 0.f));
-	a.u[1] = (m_m4ToWorld * vector4(AXIS_Y, 0.f));
-	a.u[2] = (m_m4ToWorld * vector4(AXIS_Z, 0.f));
+#pragma region OurSAT
+	vector3 centerA = GetCenterGlobal();
+	vector3 halfA = GetHalfWidth();
+	vector3 axesA[3];
+	axesA[0] = m_m4ToWorld[0];
+	axesA[1] = m_m4ToWorld[1];
+	axesA[2] = m_m4ToWorld[2];
 
-	OBB b;  b.c = a_pOther->GetCenterGlobal();  b.e = a_pOther->m_v3HalfWidth;
+	vector3 centerB = a_pOther->GetCenterGlobal();
+	vector3 halfB = a_pOther->GetHalfWidth();
+	vector3 axesB[3];
+	axesB[0] = a_pOther->m_m4ToWorld[0];
+	axesB[1] = a_pOther->m_m4ToWorld[1];
+	axesB[2] = a_pOther->m_m4ToWorld[2];
 
-	// brings other object into current objects' coordinate system
-	b.u[0] = m_m4ToWorld * (a_pOther->m_m4ToWorld * vector4(AXIS_X, 0.f));
-	b.u[1] = m_m4ToWorld * (a_pOther->m_m4ToWorld * vector4(AXIS_Y, 0.f));
-	b.u[2] = m_m4ToWorld * (a_pOther->m_m4ToWorld * vector4(AXIS_Z, 0.f));
-
-
+	// distances from shallow projection using halfwidth
 	float ra, rb;
 	matrix3 Rotate, AbsRotate;
 
 	// Compute rotation matrix, bringing other into currents' coordinate system
 	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 3; j++)
-			Rotate[i][j] = glm::dot(a.u[i], b.u[j]);
+			Rotate[i][j] = glm::dot(axesA[i], axesB[j]);
 
 	// Compute translation vector and bring it into current coordinate system
-	vector3 translation = b.c - a.c;
-	translation = vector3(glm::dot(translation, a.u[0]), glm::dot(translation, a.u[1]), glm::dot(translation, a.u[2]));
+	vector3 translation = centerB - centerA;
+	translation = vector3(glm::dot(translation, axesA[0]), glm::dot(translation, axesA[1]), glm::dot(translation, axesA[2]));
 
 	// compute absolute value of Rotate matrix with an offset value in case 
 	// two edges are at or near parallel
@@ -328,58 +325,59 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	// Test axes L = A0, L = A1, L = A2
 	// checks each of the axis planes for the current
 	for (int i = 0; i < 3; i++) {
-		
-		ra = a.e[i];
-		rb = b.e[0] * AbsRotate[i][0] + b.e[1] * AbsRotate[i][1] + b.e[2] * AbsRotate[i][2];
+
+		ra = halfA[i];
+		rb = halfB[0] * AbsRotate[i][0] + halfB[1] * AbsRotate[i][1] + halfB[2] * AbsRotate[i][2];
 		if (glm::abs(translation[i]) > ra + rb) return 1;
 	}
 	// Test axes L = B0, L = B1, L = B2
 	// checks each of the axis planes for the other
 	for (int i = 0; i < 3; i++) {
-		ra = a.e[0] * AbsRotate[0][i] + a.e[1] * AbsRotate[1][i] + a.e[2] * AbsRotate[2][i];
-		rb = b.e[i];
+		ra = halfA[0] * AbsRotate[0][i] + halfA[1] * AbsRotate[1][i] + halfA[2] * AbsRotate[2][i];
+		rb = halfB[i];
 		if (glm::abs(translation[0] * Rotate[0][i] + translation[1] * Rotate[1][i] + translation[2] * Rotate[2][i]) > ra + rb) return 1;
 	}
 
 	// checks planes created by the mix of different axes from each object using cross product
 
 	// Test axis = a0 x b0
-	ra = a.e[1] * AbsRotate[2][0] + a.e[2] * AbsRotate[1][0];
-	rb = b.e[1] * AbsRotate[0][2] + b.e[2] * AbsRotate[0][1];
+	ra = halfA[1] * AbsRotate[2][0] + halfA[2] * AbsRotate[1][0];
+	rb = halfB[1] * AbsRotate[0][2] + halfB[2] * AbsRotate[0][1];
 	if (glm::abs(translation[2] * Rotate[1][0] - translation[1] * Rotate[2][0]) > ra + rb) return 1;
 	// Test axis = a0 x b1
-	ra = a.e[1] * AbsRotate[2][1] + a.e[2] * AbsRotate[1][1];
-	rb = b.e[0] * AbsRotate[0][2] + b.e[2] * AbsRotate[0][0];
+	ra = halfA[1] * AbsRotate[2][1] + halfA[2] * AbsRotate[1][1];
+	rb = halfB[0] * AbsRotate[0][2] + halfB[2] * AbsRotate[0][0];
 	if (glm::abs(translation[2] * Rotate[1][1] - translation[1] * Rotate[2][1]) > ra + rb) return 1;
 	// Test axis = a0 x b2
-	ra = a.e[1] * AbsRotate[2][2] + a.e[2] * AbsRotate[1][2];
-	rb = b.e[0] * AbsRotate[0][1] + b.e[1] * AbsRotate[0][0];
+	ra = halfA[1] * AbsRotate[2][2] + halfA[2] * AbsRotate[1][2];
+	rb = halfB[0] * AbsRotate[0][1] + halfB[1] * AbsRotate[0][0];
 	if (glm::abs(translation[2] * Rotate[1][2] - translation[1] * Rotate[2][2]) > ra + rb) return 1;
 	// Test axis = a1 x b0
-	ra = a.e[0] * AbsRotate[2][0] + a.e[2] * AbsRotate[0][0];
-	rb = b.e[1] * AbsRotate[1][2] + b.e[2] * AbsRotate[1][1];
+	ra = halfA[0] * AbsRotate[2][0] + halfA[2] * AbsRotate[0][0];
+	rb = halfB[1] * AbsRotate[1][2] + halfB[2] * AbsRotate[1][1];
 	if (glm::abs(translation[0] * Rotate[2][0] - translation[2] * Rotate[0][0]) > ra + rb) return 1;
 	// Test axis = a1 x b1
-	ra = a.e[0] * AbsRotate[2][1] + a.e[2] * AbsRotate[0][1];
-	rb = b.e[0] * AbsRotate[1][2] + b.e[2] * AbsRotate[1][0];
+	ra = halfA[0] * AbsRotate[2][1] + halfA[2] * AbsRotate[0][1];
+	rb = halfB[0] * AbsRotate[1][2] + halfB[2] * AbsRotate[1][0];
 	if (glm::abs(translation[0] * Rotate[2][1] - translation[2] * Rotate[0][1]) > ra + rb) return 1;
 	// Test axis = a1 x b2
-	ra = a.e[0] * AbsRotate[2][2] + a.e[2] * AbsRotate[0][2];
-	rb = b.e[0] * AbsRotate[1][1] + b.e[1] * AbsRotate[1][0];
+	ra = halfA[0] * AbsRotate[2][2] + halfA[2] * AbsRotate[0][2];
+	rb = halfB[0] * AbsRotate[1][1] + halfB[1] * AbsRotate[1][0];
 	if (glm::abs(translation[0] * Rotate[2][2] - translation[2] * Rotate[0][2]) > ra + rb) return 1;
 	// Test axis = a2 x b0
-	ra = a.e[0] * AbsRotate[1][0] + a.e[1] * AbsRotate[0][0];
-	rb = b.e[1] * AbsRotate[2][2] + b.e[2] * AbsRotate[2][1];
+	ra = halfA[0] * AbsRotate[1][0] + halfA[1] * AbsRotate[0][0];
+	rb = halfB[1] * AbsRotate[2][2] + halfB[2] * AbsRotate[2][1];
 	if (glm::abs(translation[1] * Rotate[0][0] - translation[0] * Rotate[1][0]) > ra + rb) return 1;
 	// Test axis = a2 x b1
-	ra = a.e[0] * AbsRotate[1][1] + a.e[1] * AbsRotate[0][1];
-	rb = b.e[0] * AbsRotate[2][2] + b.e[2] * AbsRotate[2][0];
+	ra = halfA[0] * AbsRotate[1][1] + halfA[1] * AbsRotate[0][1];
+	rb = halfB[0] * AbsRotate[2][2] + halfB[2] * AbsRotate[2][0];
 	if (glm::abs(translation[1] * Rotate[0][1] - translation[0] * Rotate[1][1]) > ra + rb) return 1;
 	// Test axis = a2 x b2
-	ra = a.e[0] * AbsRotate[1][2] + a.e[1] * AbsRotate[0][2];
-	rb = b.e[0] * AbsRotate[2][1] + b.e[1] * AbsRotate[2][0];
+	ra = halfA[0] * AbsRotate[1][2] + halfA[1] * AbsRotate[0][2];
+	rb = halfB[0] * AbsRotate[2][1] + halfB[1] * AbsRotate[2][0];
 	if (glm::abs(translation[1] * Rotate[0][2] - translation[0] * Rotate[1][2]) > ra + rb) return 1;
 	//there is no axis test that separates this two objects
-	
+#pragma endregion
+
 	return eSATResults::SAT_NONE;
 }

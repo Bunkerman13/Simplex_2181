@@ -23,6 +23,7 @@ class MyEntity
 	matrix4 m_m4ToWorld = IDENTITY_M4; //Model matrix associated with this Entity
 	MeshManager* m_pMeshMngr = nullptr; //For rendering shapes
 
+	// one for all entities
 	static std::map<String, MyEntity*> m_IDMap; //a map of the unique ID's
 
 public:

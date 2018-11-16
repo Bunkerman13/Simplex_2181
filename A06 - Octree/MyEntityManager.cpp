@@ -17,6 +17,10 @@ void Simplex::MyEntityManager::Release(void)
 	m_uEntityCount = 0;
 	m_mEntityArray = nullptr;
 }
+void Simplex::MyEntityManager::DimensionDisplay(uint m_iID)
+{
+
+}
 Simplex::MyEntityManager* Simplex::MyEntityManager::GetInstance()
 {
 	if(m_pInstance == nullptr)
@@ -33,6 +37,7 @@ void Simplex::MyEntityManager::ReleaseInstance()
 		m_pInstance = nullptr;
 	}
 }
+
 int Simplex::MyEntityManager::GetEntityIndex(String a_sUniqueID)
 {
 	//look one by one for the specified unique id
