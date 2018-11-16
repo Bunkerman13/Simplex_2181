@@ -11,6 +11,7 @@ void NewOctant::Display(void)
 	for(int x = 0; x < 8; x++)
 		if (m_pChild[x] != nullptr)
 			m_pChild[x]->Display();
+	//DimensionDisplay(checking);
 }
 
 NewOctant::NewOctant(vector3 center, float size)
@@ -209,6 +210,18 @@ NewOctant::NewOctant(uint maxSubNum, uint idealEntityCount)
 			child->m_pChild[x]->Subdivide(child->m_pChild[x]);
 }*/
 
+void NewOctant::DimensionDisplay(uint index)
+{
+	for (int x = 0; x < 8; x++)
+		if(m_pChild[x] != nullptr)
+			if (m_pChild[x]->m_iID == index)
+				m_pChild[x]->m_pRigidBody->AddToRenderList();
+	for (int x = 0; x < 8; x++)
+		if (m_pChild[x] != nullptr)
+			m_pChild[x]->DimensionDisplay(index);
+
+}
+
 void NewOctant::Init(void)
 {
 	m_pMeshMngr = MeshManager::GetInstance();
@@ -280,7 +293,7 @@ void NewOctant::IsColliding(void)
 	for (uint i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
 	{
 		MyRigidBody* pRB = m_pEntityMngr->GetEntity(i)->GetRigidBody();
-		if (pRB->IsColliding(m_pRigidBody) && m_iID > 0)
+		if (pRB->IsColliding(m_pRigidBody) )
 		{
 			m_pEntityMngr->GetEntity(i)->AddDimension(m_iID);
 		}

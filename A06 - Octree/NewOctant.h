@@ -20,11 +20,14 @@ public:
 	void Display(void);
 	uint Subdivide(uint ID, uint currentLevel, uint maxLevel);
 	bool CheckValues(NewOctant* current);
-
+	uint checking;
 	NewOctant(uint maxSubNum = 0, uint idealEntityCount = 5);
 	std::vector<NewOctant*> leaves;
+
+	void DimensionDisplay(uint index);
 private:
 	void Init(void);
 	void AssignSpaces(void);
 	void IsColliding(void);
+	
 };
