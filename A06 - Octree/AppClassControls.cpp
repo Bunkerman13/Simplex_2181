@@ -137,8 +137,6 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			
 			SafeDelete(m_pRoot);
 			m_pRoot = new NewOctant(m_uOctantLevels, 5);
-			
-			//m_pRoot->Subdivide();
 		}
 		break;
 	case sf::Keyboard::X:
@@ -151,6 +149,10 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			m_pRoot = new NewOctant(m_uOctantLevels, 5);
 			
 		}
+		break;
+	case sf::Keyboard::G:
+		m_pRoot->visual = !(m_pRoot->visual);
+		std::cout << m_pRoot << std::endl;
 		break;
 	case sf::Keyboard::LShift:
 	case sf::Keyboard::RShift:

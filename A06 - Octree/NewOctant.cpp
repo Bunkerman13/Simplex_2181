@@ -1,10 +1,5 @@
 #include "NewOctant.h"
 
-//NewOctant::NewOctant(void)
-//{
-//	Init();
-//}
-
 void NewOctant::Display(void)
 {
 	m_pRigidBody->AddToRenderList();
@@ -18,58 +13,59 @@ NewOctant::NewOctant(vector3 center, float size)
 {
 	for (int x = 0; x < 8; x++)
 		m_pChild[x] = nullptr;
+
 	vector3 max = vector3(center.x + size, center.y + size, center.z + size);
 	vector3 min = vector3(center.x - size, center.y - size, center.z - size);
+
 	std::vector<vector3> list;
+
 	list.push_back(max);
 	list.push_back(min);
+
 	m_pRigidBody = new MyRigidBody(list);
+
+	#pragma region OldCode
+		//currentLevel = level + 1;
+
+		//int count = 0;
+		//if (populate == true)
+		//{
+		//	
+		//	for (int x = 0; x < parent->m_pEntityMngr->GetEntityCount(); x++)
+		//		if (m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(x)->GetRigidBody()))
+		//			count++;//m_pEntityMngr->AddDimension(x, childNum);
+
+		//	if (count != 0)
+		//		parent->leaves.push_back(this);
+		//}
+
+
+
+		//if (populate == true)
+		//{
+		//	int count = 0;
+		//	for (int x = 0; x < parent->m_pEntityMngr->GetEntityCount(); x++)
+		//	{
+		//		if (m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(x)->GetRigidBody()))
+		//		{
+		//			count++;
+		//		}
+		//	}
+		//	if (count > 5)
+		//	{
+		//		parent->leaves.push_back(this);
+		//		m_pRigidBody->AddToRenderList();
+		//	}
+		//		
+		//}
+	#pragma endregion
 	
-	//currentLevel = level + 1;
-
-	//int count = 0;
-	//if (populate == true)
-	//{
-	//	
-	//	for (int x = 0; x < parent->m_pEntityMngr->GetEntityCount(); x++)
-	//		if (m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(x)->GetRigidBody()))
-	//			count++;//m_pEntityMngr->AddDimension(x, childNum);
-
-	//	if (count != 0)
-	//		parent->leaves.push_back(this);
-	//}
-
-	
-
-	//if (populate == true)
-	//{
-	//	int count = 0;
-	//	for (int x = 0; x < parent->m_pEntityMngr->GetEntityCount(); x++)
-	//	{
-	//		if (m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(x)->GetRigidBody()))
-	//		{
-	//			count++;
-	//		}
-	//	}
-	//	if (count > 5)
-	//	{
-	//		parent->leaves.push_back(this);
-	//		m_pRigidBody->AddToRenderList();
-	//	}
-	//		
-	//}
 }
 
 
 
 uint NewOctant::Subdivide(uint ID, uint currentLevel, uint maxLevel)
 {
-	
-		
-	//
-	//if (parent->currentLevel == level)
-	//	populate = true;
-	
 	if (m_pChild[0] == nullptr)
 	{
 		float size = m_pRigidBody->GetHalfWidth().x / 2.f;
@@ -96,8 +92,8 @@ uint NewOctant::Subdivide(uint ID, uint currentLevel, uint maxLevel)
 					m_pChild[x]->m_iID = ID;
 				}
 			}
-			
-			
+			/*else
+				m_pChild[x] = nullptr;*/
 		}
 		
 	}
@@ -116,28 +112,20 @@ uint NewOctant::Subdivide(uint ID, uint currentLevel, uint maxLevel)
 			
 	}
 	
-	//m_iID = ID;
 	return ID;
 }
 
 bool NewOctant::CheckValues(NewOctant * current)
 {
 	m_pEntityMngr = MyEntityManager::GetInstance();
+
 	int count = 0;
 	for (int x = 0; x < m_pEntityMngr->GetEntityCount(); x++)
-	{
 		if (current->m_pRigidBody->IsColliding(m_pEntityMngr->GetEntity(x)->GetRigidBody()))
-		{
 			count++;
-		}
-
-	}
 
 	if (count < 5)
-	{
-
 		return false;
-	}
 
 	return true;
 }
@@ -147,47 +135,48 @@ NewOctant::NewOctant(uint maxSubNum, uint idealEntityCount)
 {
 	
 	Init();
+	//visual = false;
 	for (int x = 1; x < maxSubNum; x++)
 	{
-		/*leaves.clear();*/
 		m_pEntityMngr->ClearDimensionSetAll();
 		Subdivide(m_iID, x+1, maxSubNum);
-		
-		/*parent->currentLevel++;*/
 	}
 	
-	/*int num = pow(8, currentLevel);
-	for (int x = 0; x < num; x++)
-	{
+	#pragma region OldCode
+		/*int num = pow(8, currentLevel);
+		for (int x = 0; x < num; x++)
+		{
 		m_pEntityMngr->AddDimension(currentLevel, num);
-	}*/
-	//std::cout << "Previous: " << parent->leaves.size() << std::endl;
+		}*/
+		//std::cout << "Previous: " << parent->leaves.size() << std::endl;
 
-	//for (int x = 0; x < parent->leaves.size(); x++)
-	//{
-	//	//int count = 0;
-	//	for (int y = 0; y < parent->m_pEntityMngr->GetEntityCount(); y++)
-	//		if (parent->leaves[x]->m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(y)->GetRigidBody()))
-	//		{
-	//			parent->m_pEntityMngr->AddDimension(y, x);
-	//			//count++;
-	//		}
-	//	//if (count == 0) { SafeDelete(parent->leaves[x]); parent->leaves.erase(parent->leaves.cbegin + x); }
-	//		
+		//for (int x = 0; x < parent->leaves.size(); x++)
+		//{
+		//	//int count = 0;
+		//	for (int y = 0; y < parent->m_pEntityMngr->GetEntityCount(); y++)
+		//		if (parent->leaves[x]->m_pRigidBody->IsColliding(parent->m_pEntityMngr->GetEntity(y)->GetRigidBody()))
+		//		{
+		//			parent->m_pEntityMngr->AddDimension(y, x);
+		//			//count++;
+		//		}
+		//	//if (count == 0) { SafeDelete(parent->leaves[x]); parent->leaves.erase(parent->leaves.cbegin + x); }
+		//		
 
-	//}
-	//std::cout << "After: " << parent->leaves.size() << std::endl;
-	
+		//}
+		//std::cout << "After: " << parent->leaves.size() << std::endl;
+	#pragma endregion
+
 	AssignSpaces();
 	
 }
 
-//old code
-/*oid NewOctant::Subdivide(NewOctant* child)
-{
-	
-	if (child->m_pChild[0] == nullptr)
-	{
+	#pragma region OldCode
+		//old code
+		/*oid NewOctant::Subdivide(NewOctant* child)
+		{
+
+		if (child->m_pChild[0] == nullptr)
+		{
 		float size = (child->m_pRigidBody->GetMaxLocal().x - child->m_pRigidBody->GetCenterLocal().x) / 2.f;
 
 		vector3 centerPoints[8];
@@ -195,7 +184,7 @@ NewOctant::NewOctant(uint maxSubNum, uint idealEntityCount)
 		centerPoints[1] = vector3(child->m_pRigidBody->GetCenterLocal().x + (size), child->m_pRigidBody->GetCenterLocal().y + (size), child->m_pRigidBody->GetCenterLocal().z - (size));
 		centerPoints[2] = vector3(child->m_pRigidBody->GetCenterLocal().x - (size), child->m_pRigidBody->GetCenterLocal().y + (size), child->m_pRigidBody->GetCenterLocal().z - (size));
 		centerPoints[3] = vector3(child->m_pRigidBody->GetCenterLocal().x - (size), child->m_pRigidBody->GetCenterLocal().y + (size), child->m_pRigidBody->GetCenterLocal().z + (size));
-																												  
+
 		centerPoints[4] = vector3(child->m_pRigidBody->GetCenterLocal().x + (size), child->m_pRigidBody->GetCenterLocal().y - (size), child->m_pRigidBody->GetCenterLocal().z + (size));
 		centerPoints[5] = vector3(child->m_pRigidBody->GetCenterLocal().x + (size), child->m_pRigidBody->GetCenterLocal().y - (size), child->m_pRigidBody->GetCenterLocal().z - (size));
 		centerPoints[6] = vector3(child->m_pRigidBody->GetCenterLocal().x - (size), child->m_pRigidBody->GetCenterLocal().y - (size), child->m_pRigidBody->GetCenterLocal().z - (size));
@@ -203,12 +192,15 @@ NewOctant::NewOctant(uint maxSubNum, uint idealEntityCount)
 
 
 		for (int x = 0; x < 8; x++)
-			child->m_pChild[x] = new NewOctant(centerPoints[x], size);
-	}
-	else
+		child->m_pChild[x] = new NewOctant(centerPoints[x], size);
+		}
+		else
 		for (int x = 0; x < 8; x++)
-			child->m_pChild[x]->Subdivide(child->m_pChild[x]);
-}*/
+		child->m_pChild[x]->Subdivide(child->m_pChild[x]);
+		}*/
+	#pragma endregion
+
+
 
 void NewOctant::DimensionDisplay(uint index)
 {
@@ -216,6 +208,7 @@ void NewOctant::DimensionDisplay(uint index)
 		if(m_pChild[x] != nullptr)
 			if (m_pChild[x]->m_iID == index)
 				m_pChild[x]->m_pRigidBody->AddToRenderList();
+
 	for (int x = 0; x < 8; x++)
 		if (m_pChild[x] != nullptr)
 			m_pChild[x]->DimensionDisplay(index);
@@ -224,7 +217,8 @@ void NewOctant::DimensionDisplay(uint index)
 
 void NewOctant::Init(void)
 {
-	m_pMeshMngr = MeshManager::GetInstance();
+	visual = false;
+	//m_pMeshMngr = MeshManager::GetInstance();
 	m_pEntityMngr = MyEntityManager::GetInstance();
 	
 	std::vector<vector3> v3MaxMin_list;
@@ -236,37 +230,32 @@ void NewOctant::Init(void)
 		v3MaxMin_list.push_back(v3Min);
 		v3MaxMin_list.push_back(v3Max);
 
-		//vector3 v3Position = pRG->GetCenterGlobal();
+		#pragma region OldCode
+			//vector3 v3Position = pRG->GetCenterGlobal();
 
-		/*if (v3Position.x < 0.0f)
-		{
+			/*if (v3Position.x < 0.0f)
+			{
 			if (v3Position.x < -17.0f)
-				m_pEntityMngr->AddDimension(i, 1);
+			m_pEntityMngr->AddDimension(i, 1);
 			else
-				m_pEntityMngr->AddDimension(i, 2);
-		}
-		else if (v3Position.x > 0.0f)
-		{
+			m_pEntityMngr->AddDimension(i, 2);
+			}
+			else if (v3Position.x > 0.0f)
+			{
 			if (v3Position.x > 17.0f)
-				m_pEntityMngr->AddDimension(i, 3);
+			m_pEntityMngr->AddDimension(i, 3);
 			else
-				m_pEntityMngr->AddDimension(i, 4);
-				vector3 v3Min = pRG->GetMinGlobal();
-		}*/
-
+			m_pEntityMngr->AddDimension(i, 4);
+			vector3 v3Min = pRG->GetMinGlobal();
+			}*/
+	#pragma endregion
 	}
+
 	for (uint i = 0; i < 8; i++)
 	{
 		m_pChild[i] = nullptr;
 	}
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
-
-	vector3 v3Center = m_pRigidBody->GetCenterLocal();
-	vector3 v3HalfWidth = m_pRigidBody->GetHalfWidth();
-	float fSize = (v3HalfWidth.x) / 2.0f;
-	float fCenters = fSize;
-	//parent->currentLevel++;
-	//Subdivide(5, currentLevel, parent);
 	
 	m_iID = 0;
 }
@@ -293,7 +282,7 @@ void NewOctant::IsColliding(void)
 	for (uint i = 0; i < m_pEntityMngr->GetEntityCount(); ++i)
 	{
 		MyRigidBody* pRB = m_pEntityMngr->GetEntity(i)->GetRigidBody();
-		if (pRB->IsColliding(m_pRigidBody) )
+		if (pRB->IsColliding(m_pRigidBody) && m_iID != 0)
 		{
 			m_pEntityMngr->GetEntity(i)->AddDimension(m_iID);
 		}
