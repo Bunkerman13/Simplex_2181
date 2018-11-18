@@ -26,10 +26,11 @@ class Application
 	///
 #pragma region MINE:addedVariables
 	NewOctant* m_pRoot = nullptr;
+	bool showDimensions = true;
 #pragma endregion
 	///
 private:
-	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu"; //programmer
+	String m_sProgrammer = "Elliot Privateer - ejp4604@rit.edu"; //programmer
 
 	static ImGuiObject gui; //GUI object
 	bool m_bGUI_Main = true; //show Main GUI window?

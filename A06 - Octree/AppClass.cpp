@@ -36,7 +36,6 @@ void Application::InitVariables(void)
 #pragma region MINE:createRoot
 	m_pRoot = new NewOctant(m_uOctantLevels, 5);
 #pragma endregion
-
 	///
 }
 void Application::Update(void)
@@ -62,7 +61,7 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
-	//if(m_pRoot->checking)
+	if(showDimensions)
 		m_pRoot->Display();
 	
 	// draw a skybox
